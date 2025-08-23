@@ -1,85 +1,85 @@
-# This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+# .goreleaser.yaml configuration for GoReleaser v2
+# See https://goreleaser.com/customization/ for detailed documentation
+
+version: 2
+
 env:
   - CGO_ENABLED=0
+
 before:
   hooks:
-    # We strongly recommend running tests to catch any regression before release.
-    # Even though, this an optional step.
+    # Run tests to catch regressions before release
     - go test ./...
-    # As part of the release doc files are included as a separate deliverable for
-    # consumption by Packer.io. To include a separate docs.zip uncomment the following command.
+    # Optional: Uncomment to include docs.zip for Packer.io
     #- make ci-release-docs
-    # Check plugin compatibility with required version of the Packer SDK
+    # Check plugin compatibility with required Packer SDK version
     - make plugin-check
+
 builds:
-  # A separated build to run the packer-plugins-check only once for a linux_amd64 binary
-  -
-    id: plugin-check
-    mod_timestamp: '{{ .CommitTimestamp }}'
+  - id: plugin-check
+    binary: "{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}"
+    env:
+      - CGO_ENABLED=0
     flags:
-      - -trimpath #removes all file system paths from the compiled executable
+      - -trimpath
     ldflags:
-      - '-s -w -X {{ .ModulePath }}/version.Version={{.Version}} -X {{ .ModulePath }}/version.VersionPrerelease= '
+      - -s -w -X {{ .ModulePath }}/version.Version={{.Version}} -X {{ .ModulePath }}/version.VersionPrerelease=
     goos:
       - linux
     goarch:
       - amd64
-    binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
-  -
-    mod_timestamp: '{{ .CommitTimestamp }}'
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+  - binary: "{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}"
+    env:
+      - CGO_ENABLED=0
     flags:
-      - -trimpath #removes all file system paths from the compiled executable
+      - -trimpath
     ldflags:
-      - '-s -w -X {{ .ModulePath }}/version.Version={{.Version}} -X {{ .ModulePath }}/version.VersionPrerelease= '
+      - -s -w -X {{ .ModulePath }}/version.Version={{.Version}} -X {{ .ModulePath }}/version.VersionPrerelease=
     goos:
-      - netbsd
-      - solaris
-      - openbsd
-      - freebsd
       - windows
       - linux
       - darwin
     goarch:
       - amd64
-      - '386'
-      - arm
       - arm64
     ignore:
-      - goos: openbsd
-        goarch: arm64
-      - goos: darwin
-        goarch: '386'
       - goos: linux
         goarch: amd64
-    binary: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
 archives:
-- format: zip
-  files:
-    - none*
-  name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}'
+  - id: default
+    format: zip
+    files:
+      - none*
+    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Env.API_VERSION }}_{{ .Os }}_{{ .Arch }}"
+
 checksum:
-  name_template: '{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS'
+  name_template: "{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS"
   algorithm: sha256
+
 signs:
   - artifacts: checksum
     args:
-      # if you are using this is in a GitHub action or some other automated pipeline, you
-      # need to pass the batch flag to indicate its not interactive.
-      - "--batch"
-      - "--local-user"
+      - --batch
+      - --local-user
       - "{{ .Env.GPG_FINGERPRINT }}"
-      - "--output"
+      - --output
       - "${signature}"
-      - "--detach-sign"
+      - --detach-sign
       - "${artifact}"
+
 release:
-  # If you want to manually examine the release before its live, uncomment this line:
+  # Uncomment to create a draft release for manual review
   # draft: true
-  # As part of the release doc files are included as a separate deliverable for consumption by Packer.io.
-  # To include a separate docs.zip uncomment the extra_files config and the docs.zip command hook above.
-  #extra_files:
-  #- glob: ./docs.zip
+  # Optional: Uncomment to include docs.zip for Packer.io
+  # extra_files:
+  #   - glob: ./docs.zip
+  github:
+    owner: "{{ .Owner }}"
+    name: "{{ .ProjectName }}"
 
 changelog:
-  skip: true
+  disable: true
