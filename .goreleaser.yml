@@ -78,8 +78,8 @@ release:
   # extra_files:
   #   - glob: ./docs.zip
   github:
-    owner: "{{ .Owner }}"
-    name: "{{ .ProjectName }}"
+    owner: denisslapchenko
+    name: packer-plugin-ionoscloud
 
 changelog:
   disable: true
