@@ -78,7 +78,7 @@ release:
   # extra_files:
   #   - glob: ./docs.zip
   github:
-    owner: denisslapchenko
+    owner: dennislapchenko
     name: packer-plugin-ionoscloud
 
 changelog:
