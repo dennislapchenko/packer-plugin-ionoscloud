@@ -23,6 +23,7 @@ type Config struct {
 
 	IonosUsername string `mapstructure:"username"`
 	IonosPassword string `mapstructure:"password"`
+	IonosToken    string `mapstructure:"token"`
 	IonosApiUrl   string `mapstructure:"url"`
 
 	Region       string  `mapstructure:"location"`
@@ -83,6 +84,10 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		c.IonosPassword = os.Getenv("IONOS_PASSWORD")
 	}
 
+	if c.IonosToken == "" {
+		c.IonosToken = os.Getenv("IONOS_TOKEN")
+	}
+
 	if c.IonosApiUrl == "" {
 		c.IonosApiUrl = "https://api.ionos.com"
 	}
@@ -116,20 +121,19 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			errs, errors.New("IONOS 'image' is required"))
 	}
 
-	if c.IonosUsername == "" {
+	if c.IonosToken == "" && c.IonosUsername == "" && c.IonosPassword == "" {
 		errs = packersdk.MultiErrorAppend(
-			errs, errors.New("IONOS username is required"))
-	}
-
-	if c.IonosPassword == "" {
+			errs, errors.New("IONOS authentication is required, either via token or username/password"))
+	} else if (c.IonosUsername == "" || c.IonosPassword == "") && c.IonosToken == "" {
 		errs = packersdk.MultiErrorAppend(
-			errs, errors.New("IONOS password is required"))
+			errs, errors.New("IONOS username and password is required when token is not provided"))
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {
 		return nil, errs
 	}
 	packersdk.LogSecretFilter.Set(c.IonosUsername)
+	packersdk.LogSecretFilter.Set(c.IonosToken)
 
 	return nil, nil
 }

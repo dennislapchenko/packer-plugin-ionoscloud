@@ -80,7 +80,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 
 func (b *Builder) newAPIClient(state multistep.StateBag) (*ionoscloud.APIClient, error) {
 	c := state.Get("config").(*Config)
-	cfg := ionoscloud.NewConfiguration(c.IonosUsername, c.IonosPassword, "", "")
+	cfg := ionoscloud.NewConfiguration(c.IonosUsername, c.IonosPassword, c.IonosToken, "")
 	cfg.SetDepth(5)
 
 	// new apiclient for ionoscloud

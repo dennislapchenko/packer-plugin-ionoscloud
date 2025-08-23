@@ -28,11 +28,15 @@ supported. To obtain full list of available images you can use
 
 - `password` (string) - IONOS password. This can be specified via
 environment variable `IONOS_PASSWORD`, if provided. The value
-defined in the config has precedence over environemnt variable.
+defined in the config has precedence over environemnt variable. *either username and password or token*
 
 - `username` (string) - IONOS username. This can be specified via
 environment variable `IONOS_USERNAME`, if provided. The value
-defined in the config has precedence over environemnt variable.
+defined in the config has precedence over environemnt variable. *either username and password or token*
+
+- `token` (string) - IONOS token. This can be specified via
+environment variable `IONOS_TOKEN`, if provided. The value
+defined in the config has precedence over environemnt variable. *either username and password or token*
 
 - `ssh_username` (string) - SSH username to use to connect to the instance, *must use `root`*.
 

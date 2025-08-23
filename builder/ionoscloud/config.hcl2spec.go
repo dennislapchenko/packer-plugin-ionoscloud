@@ -68,6 +68,7 @@ type FlatConfig struct {
 	WinRMInsecure             *bool             `mapstructure:"winrm_insecure" cty:"winrm_insecure" hcl:"winrm_insecure"`
 	WinRMUseNTLM              *bool             `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm" hcl:"winrm_use_ntlm"`
 	IonosUsername             *string           `mapstructure:"username" cty:"username" hcl:"username"`
+	IonosToken                *string           `mapstructure:"token" cty:"token" hcl:"token"`
 	IonosPassword             *string           `mapstructure:"password" cty:"password" hcl:"password"`
 	IonosApiUrl               *string           `mapstructure:"url" cty:"url" hcl:"url"`
 	Region                    *string           `mapstructure:"location" cty:"location" hcl:"location"`
