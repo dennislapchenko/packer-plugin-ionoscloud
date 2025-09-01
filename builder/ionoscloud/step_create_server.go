@@ -55,11 +55,23 @@ func (s *stepCreateServer) Run(ctx context.Context, state multistep.StateBag) mu
 	if c.Comm.SSHPublicKey != nil {
 		props.SshKeys = &[]string{string(c.Comm.SSHPublicKey)}
 	}
+
+	templateId := ""
+	if c.ServerType == "CUBE" && c.CubeTemplate != "" {
+		templateId, err = s.getTemplateId(c.CubeTemplate)
+		if err != nil {
+			ui.Error(fmt.Sprintf("Error occurred while getting template %s", err.Error()))
+			return multistep.ActionHalt
+		}
+	}
+
 	serverReq := ionoscloud.Server{
 		Properties: &ionoscloud.ServerProperties{
-			Name:  ionoscloud.PtrString(c.SnapshotName),
-			Ram:   ionoscloud.PtrInt32(c.Ram),
-			Cores: ionoscloud.PtrInt32(c.Cores),
+			Name:         ionoscloud.PtrString(c.SnapshotName),
+			Ram:          ionoscloud.PtrInt32(c.Ram),
+			Cores:        ionoscloud.PtrInt32(c.Cores),
+			Type:         ionoscloud.PtrString(c.ServerType),
+			TemplateUuid: ionoscloud.PtrString(templateId),
 		},
 		Entities: &ionoscloud.ServerEntities{
 			Volumes: &ionoscloud.AttachedVolumes{
@@ -316,6 +328,23 @@ func (s *stepCreateServer) findServerById(ctx context.Context, dcId, serverID st
 			"error attaching NIC (%w)", err)
 	}
 	return &server, nil
+}
+
+// getTemplateId - gets a template id by name
+func (s *stepCreateServer) getTemplateId(templateName string) (string, error) {
+	templates, _, err := s.client.TemplatesApi.TemplatesGet(context.Background()).Depth(1).Execute()
+	if err != nil {
+		return "", fmt.Errorf("an error occurred while fetching IonosCloud templates %w ", err)
+	}
+
+	if templates.Items != nil {
+		for _, tmp := range *templates.Items {
+			if strings.Contains(strings.ToLower(*tmp.Properties.Name), strings.ToLower(templateName)) {
+				return *tmp.Id, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("IonosCloud template %s not found", templateName)
 }
 
 // getRequestPath - returns location header value which is the path

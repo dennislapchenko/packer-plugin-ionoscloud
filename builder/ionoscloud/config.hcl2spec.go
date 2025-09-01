@@ -76,6 +76,8 @@ type FlatConfig struct {
 	SnapshotName              *string           `mapstructure:"snapshot_name" cty:"snapshot_name" hcl:"snapshot_name"`
 	DiskSize                  *float32          `mapstructure:"disk_size" cty:"disk_size" hcl:"disk_size"`
 	DiskType                  *string           `mapstructure:"disk_type" cty:"disk_type" hcl:"disk_type"`
+	ServerType                *string           `mapstructure:"server_type" cty:"server_type" hcl:"server_type"`
+	CubeTemplate              *string           `mapstructure:"cube_template" cty:"cube_template" hcl:"cube_template"`
 	Cores                     *int32            `mapstructure:"cores" cty:"cores" hcl:"cores"`
 	Ram                       *int32            `mapstructure:"ram" cty:"ram" hcl:"ram"`
 	Retries                   *int              `mapstructure:"retries" cty:"retries" hcl:"retries"`
@@ -159,6 +161,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"snapshot_name":                &hcldec.AttrSpec{Name: "snapshot_name", Type: cty.String, Required: false},
 		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.Number, Required: false},
 		"disk_type":                    &hcldec.AttrSpec{Name: "disk_type", Type: cty.String, Required: false},
+		"server_type":                    &hcldec.AttrSpec{Name: "server_type", Type: cty.String, Required: false},
+		"cube_template":                    &hcldec.AttrSpec{Name: "cube_template", Type: cty.String, Required: false},
 		"cores":                        &hcldec.AttrSpec{Name: "cores", Type: cty.Number, Required: false},
 		"ram":                          &hcldec.AttrSpec{Name: "ram", Type: cty.Number, Required: false},
 		"retries":                      &hcldec.AttrSpec{Name: "retries", Type: cty.Number, Required: false},
