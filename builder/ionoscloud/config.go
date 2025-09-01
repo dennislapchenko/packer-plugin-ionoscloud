@@ -31,6 +31,8 @@ type Config struct {
 	SnapshotName string  `mapstructure:"snapshot_name"`
 	DiskSize     float32 `mapstructure:"disk_size"`
 	DiskType     string  `mapstructure:"disk_type"`
+	ServerType   string  `mapstructure:"server_type"`
+	CubeTemplate string  `mapstructure:"cube_template"`
 	Cores        int32   `mapstructure:"cores"`
 	Ram          int32   `mapstructure:"ram"`
 	Retries      int     `mapstructure:"retries"`
@@ -119,6 +121,13 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	if c.Image == "" {
 		errs = packersdk.MultiErrorAppend(
 			errs, errors.New("IONOS 'image' is required"))
+	}
+
+	if c.ServerType == "CUBE" {
+		if c.CubeTemplate == "" {
+			errs = packersdk.MultiErrorAppend(
+				errs, errors.New("IONOS 'cube_template' is required for server_type CUBE"))
+		}
 	}
 
 	if c.IonosToken == "" && c.IonosUsername == "" && c.IonosPassword == "" {
