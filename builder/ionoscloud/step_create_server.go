@@ -56,23 +56,27 @@ func (s *stepCreateServer) Run(ctx context.Context, state multistep.StateBag) mu
 		props.SshKeys = &[]string{string(c.Comm.SSHPublicKey)}
 	}
 
-	templateId := ""
-	if c.ServerType == "CUBE" && c.CubeTemplate != "" {
-		templateId, err = s.getTemplateId(c.CubeTemplate)
+	serverProps := &ionoscloud.ServerProperties{
+		Name: ionoscloud.PtrString(c.SnapshotName),
+	}
+
+	if c.ServerType == "CUBE" {
+		templateId, err := s.getTemplateId(c.CubeTemplate)
 		if err != nil {
 			ui.Error(fmt.Sprintf("Error occurred while getting template %s", err.Error()))
 			return multistep.ActionHalt
 		}
+		serverProps.Type = ionoscloud.PtrString(c.ServerType)
+		serverProps.TemplateUuid = ionoscloud.PtrString(templateId)
+
+		props.Size = nil
+	} else {
+		serverProps.Ram = ionoscloud.PtrInt32(c.Ram)
+		serverProps.Cores = ionoscloud.PtrInt32(c.Cores)
 	}
 
 	serverReq := ionoscloud.Server{
-		Properties: &ionoscloud.ServerProperties{
-			Name:         ionoscloud.PtrString(c.SnapshotName),
-			Ram:          ionoscloud.PtrInt32(c.Ram),
-			Cores:        ionoscloud.PtrInt32(c.Cores),
-			Type:         ionoscloud.PtrString(c.ServerType),
-			TemplateUuid: ionoscloud.PtrString(templateId),
-		},
+		Properties: serverProps,
 		Entities: &ionoscloud.ServerEntities{
 			Volumes: &ionoscloud.AttachedVolumes{
 				Items: &[]ionoscloud.Volume{
