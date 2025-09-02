@@ -32,7 +32,7 @@ func (s *stepCreateServer) Run(ctx context.Context, state multistep.StateBag) mu
 
 	ui.Say("Creating Virtual Data Center...")
 
-	img, err := s.getImageId(c.Image, c, state)
+	img, err := s.getImageId(c.Image, c, ui)
 	if err != nil {
 		ui.Error(fmt.Sprintf("Error occurred while getting image %s", err.Error()))
 		return multistep.ActionHalt
@@ -192,7 +192,7 @@ func (s *stepCreateServer) deleteDatacenter(apiClient *ionoscloud.APIClient, dat
 	return apiClient.WaitForDeletion(context.Background(), processRequestDatacenterDelete, datacenterID)
 }
 
-func (s *stepCreateServer) getImageId(imageName string, c *Config, state multistep.StateBag) (string, error) {
+func (s *stepCreateServer) getImageId(imageName string, c *Config, ui packersdk.Ui) (string, error) {
 	images, resp, err := s.client.ImagesApi.ImagesGet(context.Background()).Execute()
 	if err != nil {
 		return "", err
@@ -200,13 +200,13 @@ func (s *stepCreateServer) getImageId(imageName string, c *Config, state multist
 	if resp.StatusCode > 299 {
 		return "", errors.New("error occurred while getting images")
 	}
-	ui := state.Get("ui").(packersdk.Ui)
 
-	ui.Say(fmt.Sprintf("%+v", images))
+	ui.Say("getting imge id")
 
 	for i := 0; i < len(*images.Items); i++ {
 		imgName := ""
 		items := *images.Items
+		ui.Say(fmt.Sprintf("%+v", items))
 		if *items[i].Properties.Name != "" {
 			imgName = *items[i].Properties.Name
 		}
