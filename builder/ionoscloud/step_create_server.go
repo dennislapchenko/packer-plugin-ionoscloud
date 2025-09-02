@@ -193,7 +193,6 @@ func (s *stepCreateServer) deleteDatacenter(apiClient *ionoscloud.APIClient, dat
 }
 
 func (s *stepCreateServer) getImageId(imageName string, c *Config, ui packersdk.Ui) (string, error) {
-	ui.Say("getting imge id")
 	images, resp, err := s.client.ImagesApi.ImagesGet(context.Background()).Execute()
 	if err != nil {
 		return "", err
@@ -201,17 +200,15 @@ func (s *stepCreateServer) getImageId(imageName string, c *Config, ui packersdk.
 	if resp.StatusCode > 299 {
 		return "", errors.New("error occurred while getting images")
 	}
-	ui.Say("huj")
 
 	for i := 0; i < len(*images.Items); i++ {
 		imgName := ""
 		items := *images.Items
-		ui.Say(fmt.Sprintf("%+v", items))
 		if *items[i].Properties.Name != "" {
 			imgName = *items[i].Properties.Name
 		}
 		diskType := c.DiskType
-		if c.DiskType == "SSD" {
+		if c.DiskType == "SSD" || c.DiskType == "DAS" {
 			diskType = "HDD"
 		}
 		if imgName != "" && strings.Contains(strings.ToLower(imgName), strings.ToLower(imageName)) && *items[i].Properties.ImageType == diskType && *items[i].Properties.Location == c.Region && *items[i].Properties.Public {
