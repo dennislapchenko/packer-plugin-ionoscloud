@@ -30,7 +30,7 @@ func (s *stepCreateServer) Run(ctx context.Context, state multistep.StateBag) mu
 	ui := state.Get("ui").(packersdk.Ui)
 	c := state.Get("config").(*Config)
 
-	ui.Say("Creating Virtual Data Center...")
+	ui.Say("Creating Virtual Data Centerd...")
 
 	img, err := s.getImageId(c.Image, c, ui)
 	if err != nil {
@@ -193,6 +193,7 @@ func (s *stepCreateServer) deleteDatacenter(apiClient *ionoscloud.APIClient, dat
 }
 
 func (s *stepCreateServer) getImageId(imageName string, c *Config, ui packersdk.Ui) (string, error) {
+	ui.Say("getting imge id")
 	images, resp, err := s.client.ImagesApi.ImagesGet(context.Background()).Execute()
 	if err != nil {
 		return "", err
@@ -200,8 +201,7 @@ func (s *stepCreateServer) getImageId(imageName string, c *Config, ui packersdk.
 	if resp.StatusCode > 299 {
 		return "", errors.New("error occurred while getting images")
 	}
-
-	ui.Say("getting imge id")
+	ui.Say("huj")
 
 	for i := 0; i < len(*images.Items); i++ {
 		imgName := ""
