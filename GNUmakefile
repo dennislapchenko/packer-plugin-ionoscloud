@@ -8,11 +8,13 @@ HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/pac
 .PHONY: dev
 
 build:
-	@go build -o ${BINARY}
+	@rm -vf ${BINARY}
+	@go build -v -o ${BINARY}
 
-dev: build
-	@mkdir -p ~/.packer.d/plugins/
-	@mv ${BINARY} ~/.packer.d/plugins/${BINARY}
+dev:
+	@rm -vf plugin
+	@go build -o plugin
+	@mv -v plugin /opt/homebrew/bin/github.com/dennislapchenko/ionoscloud/packer-plugin-ionoscloud_v1.2.0_x5.0_darwin_arm64
 
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m

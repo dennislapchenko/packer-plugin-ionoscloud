@@ -31,11 +31,14 @@ func (s *stepCreateServer) Run(ctx context.Context, state multistep.StateBag) mu
 	c := state.Get("config").(*Config)
 
 	ui.Say("Creating Virtual Data Center...")
+
 	img, err := s.getImageId(c.Image, c)
 	if err != nil {
 		ui.Error(fmt.Sprintf("Error occurred while getting image %s", err.Error()))
 		return multistep.ActionHalt
 	}
+	ui.Say("image: " + c.Image)
+	ui.Say("image id: " + img)
 
 	props := &ionoscloud.VolumeProperties{
 		Type:  ionoscloud.PtrString(c.DiskType),
